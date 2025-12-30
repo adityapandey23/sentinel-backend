@@ -18,22 +18,33 @@ export class AuthController implements interfaces.Controller {
     ) {}
 
     @httpPost("/register")
-    private register(
+    private async register(
         @request() req: Request, @response() res: Response
     ) {
-        const result = this.authService.register();
+        const result = await this.authService.register(req.body);
         res.json({
-            "message": result
-        })
+            "access_token": result.accessToken,
+            "refresh_token": result.refreshToken
+        });
     }
 
     @httpPost("/login")
-    private login(
+    private async login(
         @request() req: Request, @response() res: Response
     ) {
-        const result = this.authService.login();
+        const result = await this.authService.login(req.body);
         res.json({
-            "message": result
-        })
+            "access_token": result.accessToken,
+            "refresh_token": result.refreshToken
+        });
+    }
+
+    @httpPost("/token")
+    private async token(
+        @request() req: Request, @response() res: Response
+    ) {
+        const { refreshToken } = req.body;
+        const accessToken = await this.authService.token(refreshToken);
+        res.json({ accessToken })
     }
 }

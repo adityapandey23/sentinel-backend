@@ -1,4 +1,21 @@
+export interface TokenPayload {
+    accessToken: string
+    refreshToken: string
+}
+
+export interface LoginDto {
+    email: string
+    password: string
+}
+
+export interface RegisterDto {
+    name: string
+    email: string
+    password: string
+}
+
 export interface AuthService {
-    login(): string // Will change this to an apt type
-    register(): string // Will change this to an apt type
+    login(dto: LoginDto): Promise<TokenPayload>
+    register(dto: RegisterDto): Promise<TokenPayload>
+    token(refreshToken: string): Promise<string>
 }

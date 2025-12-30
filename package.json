@@ -24,6 +24,7 @@
     "inversify": "^6.0.2",
     "inversify-express-utils": "^6.5.0",
     "pg": "^8.16.3",
+    "rabbitmq-client": "^5.0.8",
     "reflect-metadata": "^0.2.2",
     "zod": "^4.2.1"
   }

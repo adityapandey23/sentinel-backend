@@ -24,6 +24,16 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+
+    // For inversify
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Alias for paths
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["./*"],
+    }
   }
 }

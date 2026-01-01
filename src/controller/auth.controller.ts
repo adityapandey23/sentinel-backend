@@ -2,7 +2,7 @@ import {
   controller,
   httpPost,
   request,
-  response
+  response,
 } from "inversify-express-utils";
 import { inject } from "inversify";
 import { TYPES } from "@/di/types";
@@ -13,38 +13,30 @@ import type { AuthService } from "@/service/auth-service.interface";
 
 @controller("/api/auth")
 export class AuthController implements interfaces.Controller {
-    constructor(
-        @inject(TYPES.AuthService) private authService: AuthService
-    ) {}
+  constructor(@inject(TYPES.AuthService) private authService: AuthService) {}
 
-    @httpPost("/register")
-    private async register(
-        @request() req: Request, @response() res: Response
-    ) {
-        const result = await this.authService.register(req.body);
-        res.json({
-            "access_token": result.accessToken,
-            "refresh_token": result.refreshToken
-        });
-    }
+  @httpPost("/register")
+  private async register(@request() req: Request, @response() res: Response) {
+    const result = await this.authService.register(req.body);
+    res.json({
+      access_token: result.accessToken,
+      refresh_token: result.refreshToken,
+    });
+  }
 
-    @httpPost("/login")
-    private async login(
-        @request() req: Request, @response() res: Response
-    ) {
-        const result = await this.authService.login(req.body);
-        res.json({
-            "access_token": result.accessToken,
-            "refresh_token": result.refreshToken
-        });
-    }
+  @httpPost("/login")
+  private async login(@request() req: Request, @response() res: Response) {
+    const result = await this.authService.login(req.body);
+    res.json({
+      access_token: result.accessToken,
+      refresh_token: result.refreshToken,
+    });
+  }
 
-    @httpPost("/token")
-    private async token(
-        @request() req: Request, @response() res: Response
-    ) {
-        const { refreshToken } = req.body;
-        const accessToken = await this.authService.token(refreshToken);
-        res.json({ accessToken })
-    }
+  @httpPost("/token")
+  private async token(@request() req: Request, @response() res: Response) {
+    const { refreshToken } = req.body;
+    const accessToken = await this.authService.token(refreshToken);
+    res.json({ accessToken });
+  }
 }

@@ -20,7 +20,10 @@ export class SessionController implements interfaces.Controller {
   ) {}
 
   @httpGet("/")
-  private async getSessions(@request() req: Request, @response() res: Response) {
+  private async getSessions(
+    @request() req: Request,
+    @response() res: Response
+  ) {
     res.json({
       message: "Got the sessions",
     });
@@ -28,7 +31,10 @@ export class SessionController implements interfaces.Controller {
 
 
   @httpDelete("/others")
-  private async deleteSessionsExceptCurrent(@request() req: Request, @response() res: Response) {
+  private async deleteSessionsExceptCurrent(
+    @request() req: Request,
+    @response() res: Response
+  ) {
     console.log(req.ip);
     console.log(req.ips);
     res.json({

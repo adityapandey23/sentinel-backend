@@ -16,7 +16,10 @@ export class AuthController implements interfaces.Controller {
   constructor(@inject(TYPES.AuthService) private authService: AuthService) {}
 
   @httpPost("/register")
-  private async register(@request() req: Request, @response() res: Response) {
+  private async register(
+    @request() req: Request,
+    @response() res: Response
+  ) {
     const result = await this.authService.register(req.body);
     res.json({
       access_token: result.accessToken,
@@ -25,7 +28,10 @@ export class AuthController implements interfaces.Controller {
   }
 
   @httpPost("/login")
-  private async login(@request() req: Request, @response() res: Response) {
+  private async login(
+    @request() req: Request,
+    @response() res: Response
+  ) {
     const result = await this.authService.login(req.body);
     res.json({
       access_token: result.accessToken,
@@ -34,7 +40,10 @@ export class AuthController implements interfaces.Controller {
   }
 
   @httpPost("/token")
-  private async token(@request() req: Request, @response() res: Response) {
+  private async token(
+    @request() req: Request,
+    @response() res: Response
+  ) {
     const { refreshToken } = req.body;
     const accessToken = await this.authService.token(refreshToken);
     res.json({ accessToken });

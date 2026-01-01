@@ -3,6 +3,8 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import { container } from "./di/inversify.config";
 
 import "./controller/auth.controller";
+import "./controller/session.controller";
+
 import type { ConfigService } from "./service/config-service.interface";
 import { TYPES } from "./di/types";
 
@@ -10,6 +12,7 @@ const server = new InversifyExpressServer(container);
 
 server.setConfig((app) => {
   app.use(express.json());
+  app.set('trust proxy', true); // To get the ip address incase our server is behind a reverse proxy
 });
 
 server.setErrorConfig((app) => {

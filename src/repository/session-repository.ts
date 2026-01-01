@@ -21,7 +21,6 @@ export class SessionRepository {
       .select()
       .from(session)
       .where(eq(session.id, id))
-      .limit(1);
 
     return found;
   }
@@ -46,4 +45,21 @@ export class SessionRepository {
   }
 
   // Enhanced CRUD operation functions
+  async findByUserId(userId: string): Promise<Session | undefined> {
+    const [found] = await this.database
+      .select()
+      .from(session)
+      .where(eq(session.userId, userId))
+
+    return found;
+  }
+
+  async findByToken(token: string): Promise<Session | undefined> {
+    const [found] = await this.database
+      .select()
+      .from(session)
+      .where(eq(session.token, token))
+
+    return found;
+  }
 }

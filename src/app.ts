@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from "express";
+import { express as useragent } from "express-useragent";
 import { InversifyExpressServer } from "inversify-express-utils";
 import { container } from "./di/inversify.config";
 
@@ -13,6 +14,7 @@ const server = new InversifyExpressServer(container);
 server.setConfig((app) => {
   app.use(express.json());
   app.set('trust proxy', true); // To get the ip address incase our server is behind a reverse proxy
+  app.use(useragent()); // For parsing the long user agent details
 });
 
 server.setErrorConfig((app) => {

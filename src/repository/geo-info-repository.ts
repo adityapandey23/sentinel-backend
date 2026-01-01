@@ -26,16 +26,6 @@ export class GeoInfoRepository {
     return found;
   }
 
-  async findByIp(ip: string): Promise<GeoInfo | undefined> {
-    const [found] = await this.database
-      .select()
-      .from(geoInfo)
-      .where(eq(geoInfo.ip, ip))
-      .limit(1);
-
-    return found;
-  }
-
   async update(id: string, data: Partial<NewGeoInfo>): Promise<GeoInfo | undefined> {
     const [updated] = await this.database
       .update(geoInfo)
@@ -56,4 +46,13 @@ export class GeoInfoRepository {
   }
 
   // Enhanced CRUD operation functions
+  async findByIp(ip: string): Promise<GeoInfo | undefined> {
+    const [found] = await this.database
+      .select()
+      .from(geoInfo)
+      .where(eq(geoInfo.ip, ip))
+      .limit(1);
+
+    return found;
+  }
 }

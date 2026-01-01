@@ -11,12 +11,14 @@ import type { JwtPayload, JwtService } from "../jwt-service.interface";
 import { eq } from "drizzle-orm";
 import { user } from "@/db/schema";
 import { randomUUID } from "crypto";
+import type { SessionService } from "../session-service.interface";
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
     @inject(TYPES.Database) private database: NodePgDatabase,
-    @inject(TYPES.JwtService) private jwtService: JwtService
+    @inject(TYPES.JwtService) private jwtService: JwtService,
+    @inject(TYPES.SessionService) private sessionService: SessionService,
   ) {}
 
   async login(dto: LoginDto): Promise<TokenPayload> {

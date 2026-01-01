@@ -5,10 +5,8 @@ import {
   inet,
   real,
   integer,
-  pgEnum
+  boolean
 } from 'drizzle-orm/pg-core';
-
-export const deviceTypeEnum = pgEnum('device_type', ['desktop', 'mobile', 'tablet', 'unknown']);
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -49,6 +47,7 @@ export const geoInfo = pgTable('geo_info', {
   ip: inet('ip').notNull().unique(),
   countryCode: text('country_code'),
   region: text('region'),
+  city: text('city'),
   latitude: real('latitude'),
   longitude: real('longitude'),
   timezone: text('timezone'),
@@ -65,8 +64,10 @@ export const geoInfo = pgTable('geo_info', {
 export const userAgent = pgTable('user_agent', {
   id: text('id').primaryKey(),
 
-  userAgent: text('user_agent'),
-  deviceType: deviceTypeEnum('device_type'),
+    browser: text('browser'),
+    operatingSystem: text('operating_system'),
+    isMobile: boolean('is_mobile').default(false),
+    platform: text('platform'),
 
   createdAt: timestamp('created_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())

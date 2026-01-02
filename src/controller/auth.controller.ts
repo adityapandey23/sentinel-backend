@@ -52,7 +52,7 @@ export class AuthController implements interfaces.Controller {
     };
 
     const { refreshToken } = req.body;
-    const accessToken = await this.authService.token(refreshToken, context);
+    const accessToken = await this.authService.token(refreshToken);
     res.json({ accessToken });
   }
 }

@@ -1,17 +1,103 @@
 import { inject, injectable } from "inversify";
-import type { SessionService } from "../session-service.interface";
+import type { SessionContext, SessionService } from "../session-service.interface";
 import { TYPES } from "@/di/types";
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { SessionRepository } from "@/repository/session-repository";
+import type { GeoInfoRepository } from "@/repository/geo-info-repository";
+import type { UserAgentRepository } from "@/repository/user-agent-repository";
+import type { IpService } from "../ip-service.interface";
+import { createHash, randomUUID } from "crypto";
+import type { AgentDetails } from "express-useragent";
 
 @injectable()
 export class SessionServiceImpl implements SessionService {
-  constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
+  constructor(
+    @inject(TYPES.SessionRepository) private sessionRepository: SessionRepository,
+    @inject(TYPES.GeoInfoRepository) private geoInfoRepository: GeoInfoRepository,
+    @inject(TYPES.UserAgentRepository) private userAgentRepository: UserAgentRepository,
 
-  async saveSession(): Promise<void> {}
+    @inject(TYPES.IpService) private ipService: IpService,
+  ) {}
+
+  async saveSession(userId: string, refreshToken: string, expiresAt: Date, context: SessionContext) {
+
+    const geoInfoId = await this.getOrCreateGeoInfo(context.ip);
+
+    const userAgentId = await this.getOrCreateUserAgent(context.userAgent);
+
+    await this.sessionRepository.create({
+      id: randomUUID(),
+      token: refreshToken,
+      expiresAt,
+      userId,
+      geoInfoId,
+      userAgentId
+    });
+
+  }
 
   async getSessions(): Promise<void> {}
 
   async updateSession(): Promise<void> {}
 
   async deleteAllSessions(): Promise<void> {}
+
+  // Helper functions
+
+  private async getOrCreateGeoInfo(ip: string): Promise<string> {
+    // Check whether ip is already present, if so return it
+    const existing = await this.geoInfoRepository.findByIp(ip);
+    if (existing) {
+      return existing.id;
+    }
+
+    // Fetch the ip details from external API
+    const geoData = await this.ipService.getDetails(ip);
+
+    // Generate deterministic ID from IP
+    const id = createHash("sha256").update(ip).digest("hex").slice(0, 32);
+
+    // Save and return
+    if (geoData?.status === "success") {
+      const created = await this.geoInfoRepository.create({
+        id,
+        ip,
+        countryCode: geoData.countryCode,
+        region: geoData.region,
+        city: geoData.city,
+        latitude: geoData.lat,
+        longitude: geoData.lon,
+        timezone: geoData.timezone,
+        offset: geoData.offset,
+      });
+      return created!.id;
+    }
+
+    // If IP lookup failed, still create record with just the IP
+    const created = await this.geoInfoRepository.create({ id, ip });
+    return created!.id;
+  }
+
+  private async getOrCreateUserAgent(userAgent: AgentDetails): Promise<string> {
+    // Create deterministic ID from UA properties
+    const uaKey = `${userAgent.browser}|${userAgent.os}|${userAgent.platform}|${userAgent.isMobile}`;
+    const id = createHash("sha256").update(uaKey).digest("hex").slice(0, 32);
+
+    // Check if present, return it
+    const existing = await this.userAgentRepository.findById(id);
+    if (existing) {
+      return existing.id;
+    }
+
+    // If not present, create and return
+    const created = await this.userAgentRepository.create({
+      id,
+      browser: userAgent.browser,
+      operatingSystem: userAgent.os,
+      isMobile: userAgent.isMobile,
+      platform: userAgent.platform,
+    });
+
+    return created!.id;
+  }
+
 }

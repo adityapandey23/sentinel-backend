@@ -1,9 +1,9 @@
-CREATE TYPE "public"."device_type" AS ENUM('desktop', 'mobile', 'tablet', 'unknown');--> statement-breakpoint
 CREATE TABLE "geo_info" (
 	"id" text PRIMARY KEY NOT NULL,
 	"ip" "inet" NOT NULL,
 	"country_code" text,
 	"region" text,
+	"city" text,
 	"latitude" real,
 	"longitude" real,
 	"timezone" text,
@@ -24,10 +24,22 @@ CREATE TABLE "session" (
 	CONSTRAINT "session_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
+CREATE TABLE "user" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"password" text NOT NULL,
+	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	CONSTRAINT "user_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
 CREATE TABLE "user_agent" (
 	"id" text PRIMARY KEY NOT NULL,
-	"user_agent" text,
-	"device_type" "device_type",
+	"browser" text,
+	"operating_system" text,
+	"is_mobile" boolean DEFAULT false,
+	"platform" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL
 );

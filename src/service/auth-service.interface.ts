@@ -19,5 +19,5 @@ export interface RegisterDto {
 export interface AuthService {
     login(dto: LoginDto, context: SessionContext): Promise<TokenPayload>
     register(dto: RegisterDto, context: SessionContext): Promise<TokenPayload>
-    token(refreshToken: string, context: SessionContext): Promise<string>
+    token(refreshToken: string): Promise<string>
 }

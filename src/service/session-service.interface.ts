@@ -1,11 +1,18 @@
+import type { AgentDetails } from "express-useragent";
+
 export interface SessionContext {
   ip: string;
-  userAgent: any; // I know it's well typed
+  userAgent: AgentDetails;
 }
 
 export interface SessionService {
   // This needs to be called at the time of register or login
-  saveSession(userId: string, refreshToken: string, expiresAt: Date, context: SessionContext): Promise<void>; 
+  saveSession(
+    userId: string,
+    refreshToken: string,
+    expiresAt: Date,
+    context: SessionContext
+  ): void; 
 
   // This needs to be called somewhere in the middleware maybe ?
   updateSession(): Promise<void>; 

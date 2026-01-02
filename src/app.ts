@@ -1,4 +1,8 @@
-import express, { type NextFunction, type Request, type Response } from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import { express as useragent } from "express-useragent";
 import { InversifyExpressServer } from "inversify-express-utils";
 import cors from "cors";
@@ -14,40 +18,44 @@ const server = new InversifyExpressServer(container);
 
 server.setConfig((app) => {
   app.use(express.json());
-  app.set('trust proxy', true); // To get the ip address incase our server is behind a reverse proxy
+  app.set("trust proxy", true); // To get the ip address incase our server is behind a reverse proxy
   app.use(cors());
   app.use(useragent()); // For parsing the long user agent details
 });
 
 server.setErrorConfig((app) => {
-
   // Catch-all handler for invalid routes
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const error = Object.assign(new Error(`Cannot find ${req.originalUrl} on this server`), { status: 404 });
+    const error = Object.assign(
+      new Error(`Cannot find ${req.originalUrl} on this server`),
+      { status: 404 }
+    );
     next(error);
   });
 
   // Global error handler
-  app.use((err: Error & { status: number }, req: Request, res: Response, next: NextFunction) => {
-    const configService = container.get<ConfigService>(TYPES.ConfigService);
-    const isDev = configService.get('NODE_ENV') === 'development';
-    const statusCode = err.status || 500;
+  app.use(
+    (
+      err: Error & { status: number; isOperational?: boolean },
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => {
+      const configService = container.get<ConfigService>(TYPES.ConfigService);
+      const isDev = configService.get("NODE_ENV") === "development";
+      const statusCode = err.status || 500;
 
-    res.status(statusCode).json({
-      status: 'error',
-      message: err.message || 'Something went wrong on the server',
-      ...(isDev && { stack: err.stack })
-    });
-  });
+      if (!err.isOperational) {
+        console.error("Unexpected error occurred:", err);
+      }
+
+      res.status(statusCode).json({
+        status: "error",
+        message: err.isOperational ? err.message : "Something went wrong",
+        ...(isDev && { stack: err.stack }),
+      });
+    }
+  );
 });
 
 export const app = server.build();
-
-// // Health check route
-// app.get("/api/health", (req, res) => {
-//   res.status(200).json({
-//     status: "ok",
-//     message: "Server is healthy",
-//     timestamp: new Date().toISOString(),
-//   });
-// });

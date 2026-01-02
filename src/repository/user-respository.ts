@@ -4,6 +4,7 @@ import type { NewUser, User } from "@/model";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
+import { DatabaseError } from "@/errors";
 
 @injectable()
 export class UserRepository {
@@ -11,48 +12,68 @@ export class UserRepository {
 
   // Basic CRUD operation functions
   async create(data: NewUser): Promise<User | undefined> {
-    const [created] = await this.database.insert(user).values(data).returning();
-
-    return created;
+    try {
+      const [created] = await this.database.insert(user).values(data).returning();
+      return created;
+    } catch (error) {
+      console.error("Database error in UserRepository.create:", error);
+      throw new DatabaseError("Failed to create user", error as Error);
+    }
   }
 
   async findById(id: string): Promise<User | undefined> {
-    const [found] = await this.database
-      .select()
-      .from(user)
-      .where(eq(user.id, id))
-      .limit(1);
-
-    return found;
+    try {
+      const [found] = await this.database
+        .select()
+        .from(user)
+        .where(eq(user.id, id))
+        .limit(1);
+      return found;
+    } catch (error) {
+      console.error("Database error in UserRepository.findById:", error);
+      throw new DatabaseError("Failed to find user by ID", error as Error);
+    }
   }
 
   async update(id: string, data: Partial<NewUser>): Promise<User | undefined> {
-    const [updated] = await this.database
-      .update(user)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(user.id, id))
-      .returning();
-
-    return updated;
+    try {
+      const [updated] = await this.database
+        .update(user)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(user.id, id))
+        .returning();
+      return updated;
+    } catch (error) {
+      console.error("Database error in UserRepository.update:", error);
+      throw new DatabaseError("Failed to update user", error as Error);
+    }
   }
 
   async delete(id: string): Promise<User | undefined> {
-    const [deleted] = await this.database
-      .delete(user)
-      .where(eq(user.id, id))
-      .returning();
-
-    return deleted;
+    try {
+      const [deleted] = await this.database
+        .delete(user)
+        .where(eq(user.id, id))
+        .returning();
+      return deleted;
+    } catch (error) {
+      console.error("Database error in UserRepository.delete:", error);
+      throw new DatabaseError("Failed to delete user", error as Error);
+    }
   }
 
   // Enhanced CRUD operation functions
   async findByEmail(email: string): Promise<User | undefined> {
-    const [found] = await this.database
-      .select()
-      .from(user)
-      .where(eq(user.email, email))
-      .limit(1);
-
-    return found;
+    try {
+      const [found] = await this.database
+        .select()
+        .from(user)
+        .where(eq(user.email, email))
+        .limit(1);
+      return found;
+    } catch (error) {
+      console.error("Database error in UserRepository.findByEmail:", error);
+      throw new DatabaseError("Failed to find user by email", error as Error);
+    }
   }
 }

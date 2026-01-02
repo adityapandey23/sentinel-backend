@@ -11,6 +11,7 @@ import type { JwtPayload, JwtService } from "../jwt-service.interface";
 import { randomUUID } from "crypto";
 import type { SessionContext, SessionService } from "../session-service.interface";
 import type { UserRepository } from "@/repository/user-respository";
+import { ConflictError, InternalError, NotFoundError, UnauthorizedError } from "@/errors";
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
@@ -26,7 +27,7 @@ export class AuthServiceImpl implements AuthService {
     const existingUser = await this.userRepository.findByEmail(dto.email);
 
     if (!existingUser) {
-      throw new Error(`user doesn't exist`);
+      throw new UnauthorizedError("Invalid email or password");
     }
 
     const isValidPassword = await Bun.password.verify(
@@ -35,7 +36,7 @@ export class AuthServiceImpl implements AuthService {
     );
 
     if (!isValidPassword) {
-      throw new Error(`invalid email or password`);
+      throw new UnauthorizedError("Invalid email or password");
     }
 
     const payload: JwtPayload = {
@@ -67,7 +68,7 @@ export class AuthServiceImpl implements AuthService {
     const existingUser = await this.userRepository.findByEmail(dto.email);
 
     if (existingUser) {
-      throw new Error(`user already exist`);
+      throw new ConflictError("User with this email already exists");
     }
 
     const hashedPassword = await Bun.password.hash(dto.password);
@@ -80,7 +81,7 @@ export class AuthServiceImpl implements AuthService {
     });
 
     if (!newUser) {
-      throw new Error("failed to create new user");
+      throw new InternalError("Failed to create user");
     }
 
     const payload: JwtPayload = {
@@ -111,7 +112,7 @@ export class AuthServiceImpl implements AuthService {
     const existingUser = await this.userRepository.findById(payload.sub);
 
     if (!existingUser) {
-      throw new Error("user not found");
+      throw new NotFoundError("User not found");
     }
 
     const newPayload: JwtPayload = {

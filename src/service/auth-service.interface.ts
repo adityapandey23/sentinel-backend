@@ -1,3 +1,5 @@
+import type { SessionContext } from "./session-service.interface"
+
 export interface TokenPayload {
     accessToken: string
     refreshToken: string
@@ -15,7 +17,7 @@ export interface RegisterDto {
 }
 
 export interface AuthService {
-    login(dto: LoginDto): Promise<TokenPayload>
-    register(dto: RegisterDto): Promise<TokenPayload>
-    token(refreshToken: string): Promise<string>
+    login(dto: LoginDto, context: SessionContext): Promise<TokenPayload>
+    register(dto: RegisterDto, context: SessionContext): Promise<TokenPayload>
+    token(refreshToken: string, context: SessionContext): Promise<string>
 }

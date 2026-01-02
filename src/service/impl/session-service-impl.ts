@@ -5,19 +5,13 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 @injectable()
 export class SessionServiceImpl implements SessionService {
-    constructor(
-        @inject(TYPES.Database) private database: NodePgDatabase,
-    ) {}
+  constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
-    async saveSession(): Promise<void> {
-    }
+  async saveSession(): Promise<void> {}
 
-    async getSessions(): Promise<void> {
-    }
+  async getSessions(): Promise<void> {}
 
-    async updateSession(): Promise<void> {
-    }
+  async updateSession(): Promise<void> {}
 
-    async deleteAllSessions(): Promise<void> {
-    }
+  async deleteAllSessions(): Promise<void> {}
 }

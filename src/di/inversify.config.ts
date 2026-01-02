@@ -21,6 +21,12 @@ import { JwtServiceImpl } from "@/service/impl/jwt-service-impl";
 import { QueueServiceImpl } from "@/service/impl/queue-service-impl";
 import { SessionServiceImpl } from "@/service/impl/session-service-impl";
 
+// Importing Repository Implementations
+import { GeoInfoRepository } from "@/repository/geo-info-repository"; 
+import { SessionRepository } from "@/repository/session-repository";
+import { UserAgentRepository } from "@/repository/user-agent-repository";
+import { UserRepository } from "@/repository/user-respository";
+
 const container = new Container();
 
 // Binding Service to the container
@@ -32,5 +38,11 @@ container.bind<NodePgDatabase>(TYPES.Database).toConstantValue(db);
 container.bind<JwtService>(TYPES.JwtService).to(JwtServiceImpl);
 container.bind<QueueService>(TYPES.QueueService).to(QueueServiceImpl);
 container.bind<SessionService>(TYPES.SessionService).to(SessionServiceImpl);
+
+// Binding Repository to the container
+container.bind<GeoInfoRepository>(TYPES.GeoInfoRepository).to(GeoInfoRepository);
+container.bind<SessionRepository>(TYPES.SessionRepository).to(SessionRepository);
+container.bind<UserAgentRepository>(TYPES.UserAgentRepository).to(UserAgentRepository);
+container.bind<UserRepository>(TYPES.UserRepository).to(UserRepository);
 
 export { container };

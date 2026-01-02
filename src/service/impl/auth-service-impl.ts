@@ -8,107 +8,95 @@ import type {
 import { inject, injectable } from "inversify";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { JwtPayload, JwtService } from "../jwt-service.interface";
-import { eq } from "drizzle-orm";
-import { user } from "@/db/schema";
 import { randomUUID } from "crypto";
-import type { SessionService } from "../session-service.interface";
+import type { SessionContext, SessionService } from "../session-service.interface";
+import type { UserRepository } from "@/repository/user-respository";
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
+    @inject(TYPES.UserRepository) private userRepository: UserRepository,
+
     @inject(TYPES.Database) private database: NodePgDatabase,
     @inject(TYPES.JwtService) private jwtService: JwtService,
-    @inject(TYPES.SessionService) private sessionService: SessionService,
+    @inject(TYPES.SessionService) private sessionService: SessionService
   ) {}
 
-  async login(dto: LoginDto): Promise<TokenPayload> {
-    const [existingUser] = await this.database
-      .select()
-      .from(user)
-      .where(eq(user.email, dto.email))
-      .limit(1);
+  async login(dto: LoginDto, context: SessionContext): Promise<TokenPayload> {
+    const existingUser = await this.userRepository.findByEmail(dto.email);
 
-      if(!existingUser) {
-        throw new Error("Invalid email or password");
-      }
+    if (!existingUser) {
+      throw new Error(`user doesn't exist`);
+    }
 
-      const isValidPassword = await Bun.password.verify(dto.password, existingUser.password);
+    const isValidPassword = await Bun.password.verify(
+      dto.password,
+      existingUser.password
+    );
 
-      if(!isValidPassword) {
-        throw new Error("Invalid email or password");
-      }
+    if (!isValidPassword) {
+      throw new Error(`invalid email or password`);
+    }
 
-      const payload: JwtPayload = {
-        sub: existingUser.id,
-        email: existingUser.email
-      }
+    const payload: JwtPayload = {
+      sub: existingUser.id,
+      email: existingUser.email,
+    };
 
-      const [ accessToken, refreshToken ] = await Promise.all([
-        this.jwtService.signAccessToken(payload),
-        this.jwtService.signRefreshToken(payload)
-      ])
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAccessToken(payload),
+      this.jwtService.signRefreshToken(payload),
+    ]);
 
-      return { accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
-  async register(dto: RegisterDto): Promise<TokenPayload> {
-    const [existingUser] = await this.database
-      .select()
-      .from(user)
-      .where(eq(user.email, dto.email))
-      .limit(1);
+  async register(dto: RegisterDto, context: SessionContext): Promise<TokenPayload> {
+    const existingUser = await this.userRepository.findByEmail(dto.email);
 
-      if(existingUser) {
-        throw new Error("User with this email already exist");
-      }
+    if (existingUser) {
+      throw new Error(`user already exist`);
+    }
 
-      const hashedPassword = await Bun.password.hash(dto.password);
+    const hashedPassword = await Bun.password.hash(dto.password);
 
-      const userId = randomUUID();
-      const [ newUser ] = await this.database
-                            .insert(user)
-                            .values({
-                              id: userId,
-                              name: dto.name,
-                              email: dto.email,
-                              password: hashedPassword
-                            })
-                            .returning();
+    const newUser = await this.userRepository.create({
+      id: randomUUID(),
+      name: dto.name,
+      email: dto.email,
+      password: hashedPassword,
+    });
 
-      if(!newUser) {
-        throw new Error("Failed to add new user")
-      }
+    if (!newUser) {
+      throw new Error("failed to create new user");
+    }
 
-      const payload: JwtPayload = {
-        sub: newUser.id,
-        email: newUser.email
-      }
+    const payload: JwtPayload = {
+      sub: newUser.id,
+      email: newUser.email,
+    };
 
-      const [ accessToken, refreshToken ] = await Promise.all([
-        this.jwtService.signAccessToken(payload),
-        this.jwtService.signRefreshToken(payload)
-      ])
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAccessToken(payload),
+      this.jwtService.signRefreshToken(payload),
+    ]);
 
-      return { accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
-  async token(refreshToken: string): Promise<string> {
+  async token(refreshToken: string, context: SessionContext): Promise<string> {
     const payload = await this.jwtService.verifyRefreshToken(refreshToken);
 
-    const [ existingUser ] = await this.database
-                              .select()
-                              .from(user)
-                              .where(eq(user.id, payload.sub))
-                              .limit(1);
-    
-    if(!existingUser) {
-      throw new Error("User not found")
+    const existingUser = await this.userRepository.findById(payload.sub);
+
+    if (!existingUser) {
+      throw new Error("user not found");
     }
 
     const newPayload: JwtPayload = {
       sub: existingUser.id,
-      email: existingUser.email
-    }
+      email: existingUser.email,
+    };
 
     return this.jwtService.signAccessToken(newPayload);
   }

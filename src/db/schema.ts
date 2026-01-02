@@ -64,10 +64,10 @@ export const geoInfo = pgTable('geo_info', {
 export const userAgent = pgTable('user_agent', {
   id: text('id').primaryKey(),
 
-    browser: text('browser'),
-    operatingSystem: text('operating_system'),
-    isMobile: boolean('is_mobile').default(false),
-    platform: text('platform'),
+  browser: text('browser'),
+  operatingSystem: text('operating_system'),
+  isMobile: boolean('is_mobile').default(false),
+  platform: text('platform'),
 
   createdAt: timestamp('created_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())

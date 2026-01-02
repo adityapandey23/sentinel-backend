@@ -7,6 +7,7 @@ import type { UserAgentRepository } from "@/repository/user-agent-repository";
 import type { IpService } from "../ip-service.interface";
 import { createHash, randomUUID } from "crypto";
 import type { AgentDetails } from "express-useragent";
+import type { DbOrTransaction } from "@/db";
 
 @injectable()
 export class SessionServiceImpl implements SessionService {
@@ -18,11 +19,17 @@ export class SessionServiceImpl implements SessionService {
     @inject(TYPES.IpService) private ipService: IpService,
   ) {}
 
-  async saveSession(userId: string, refreshToken: string, expiresAt: Date, context: SessionContext) {
+  async saveSession(
+    userId: string,
+    refreshToken: string,
+    expiresAt: Date,
+    context: SessionContext,
+    tx?: DbOrTransaction
+  ): Promise<void> {
 
-    const geoInfoId = await this.getOrCreateGeoInfo(context.ip);
+    const geoInfoId = await this.getOrCreateGeoInfo(context.ip, tx);
 
-    const userAgentId = await this.getOrCreateUserAgent(context.userAgent);
+    const userAgentId = await this.getOrCreateUserAgent(context.userAgent, tx);
 
     await this.sessionRepository.create({
       id: randomUUID(),
@@ -31,7 +38,7 @@ export class SessionServiceImpl implements SessionService {
       userId,
       geoInfoId,
       userAgentId
-    });
+    }, tx);
 
   }
 
@@ -43,9 +50,9 @@ export class SessionServiceImpl implements SessionService {
 
   // Helper functions
 
-  private async getOrCreateGeoInfo(ip: string): Promise<string> {
+  private async getOrCreateGeoInfo(ip: string, tx?: DbOrTransaction): Promise<string> {
     // Check whether ip is already present, if so return it
-    const existing = await this.geoInfoRepository.findByIp(ip);
+    const existing = await this.geoInfoRepository.findByIp(ip, tx);
     if (existing) {
       return existing.id;
     }
@@ -68,22 +75,22 @@ export class SessionServiceImpl implements SessionService {
         longitude: geoData.lon,
         timezone: geoData.timezone,
         offset: geoData.offset,
-      });
+      }, tx);
       return created!.id;
     }
 
     // If IP lookup failed, still create record with just the IP
-    const created = await this.geoInfoRepository.create({ id, ip });
+    const created = await this.geoInfoRepository.create({ id, ip }, tx);
     return created!.id;
   }
 
-  private async getOrCreateUserAgent(userAgent: AgentDetails): Promise<string> {
+  private async getOrCreateUserAgent(userAgent: AgentDetails, tx?: DbOrTransaction): Promise<string> {
     // Create deterministic ID from UA properties
     const uaKey = `${userAgent.browser}|${userAgent.os}|${userAgent.platform}|${userAgent.isMobile}`;
     const id = createHash("sha256").update(uaKey).digest("hex").slice(0, 32);
 
     // Check if present, return it
-    const existing = await this.userAgentRepository.findById(id);
+    const existing = await this.userAgentRepository.findById(id, tx);
     if (existing) {
       return existing.id;
     }
@@ -95,7 +102,7 @@ export class SessionServiceImpl implements SessionService {
       operatingSystem: userAgent.os,
       isMobile: userAgent.isMobile,
       platform: userAgent.platform,
-    });
+    }, tx);
 
     return created!.id;
   }

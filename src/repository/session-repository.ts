@@ -5,15 +5,17 @@ import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
 import { DatabaseError } from "@/errors";
+import type { DbOrTransaction } from "@/db";
 
 @injectable()
 export class SessionRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewSession): Promise<Session | undefined> {
+  async create(data: NewSession, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [created] = await this.database.insert(session).values(data).returning();
+      const [created] = await db.insert(session).values(data).returning();
       return created;
     } catch (error) {
       console.error("Database error in SessionRepository.create:", error);
@@ -21,9 +23,10 @@ export class SessionRepository {
     }
   }
 
-  async findById(id: string): Promise<Session | undefined> {
+  async findById(id: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(session)
         .where(eq(session.id, id));
@@ -34,9 +37,10 @@ export class SessionRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewSession>): Promise<Session | undefined> {
+  async update(id: string, data: Partial<NewSession>, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [updated] = await this.database
+      const [updated] = await db
         .update(session)
         .set({ ...data, updatedAt: new Date() })
         .where(eq(session.id, id))
@@ -48,9 +52,10 @@ export class SessionRepository {
     }
   }
 
-  async delete(id: string): Promise<Session | undefined> {
+  async delete(id: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [deleted] = await this.database
+      const [deleted] = await db
         .delete(session)
         .where(eq(session.id, id))
         .returning();
@@ -62,9 +67,10 @@ export class SessionRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByUserId(userId: string): Promise<Session | undefined> {
+  async findByUserId(userId: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(session)
         .where(eq(session.userId, userId));
@@ -75,9 +81,10 @@ export class SessionRepository {
     }
   }
 
-  async findByToken(token: string): Promise<Session | undefined> {
+  async findByToken(token: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(session)
         .where(eq(session.token, token));

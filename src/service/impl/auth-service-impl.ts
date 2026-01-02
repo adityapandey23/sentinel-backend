@@ -54,12 +54,17 @@ export class AuthServiceImpl implements AuthService {
       this.jwtService.signRefreshToken(payload),
     ]);
 
-    await this.sessionService.saveSession(
-      existingUser.id,
-      refreshToken,
-      refreshTokenExpiry,
-      context
-    );
+    // Wrap session creation in a transaction to ensure atomicity
+    // If any part fails, the entire operation rolls back
+    await this.database.transaction(async (tx) => {
+      await this.sessionService.saveSession(
+        existingUser.id,
+        refreshToken,
+        refreshTokenExpiry,
+        context,
+        tx
+      );
+    });
 
     return { accessToken, refreshToken };
   }
@@ -73,35 +78,50 @@ export class AuthServiceImpl implements AuthService {
 
     const hashedPassword = await Bun.password.hash(dto.password);
 
-    const newUser = await this.userRepository.create({
-      id: randomUUID(),
-      name: dto.name,
-      email: dto.email,
-      password: hashedPassword,
-    });
-
-    if (!newUser) {
-      throw new InternalError("Failed to create user");
-    }
-
-    const payload: JwtPayload = {
-      sub: newUser.id,
-      email: newUser.email,
-    };
-
+    // Generate tokens before transaction so we can use refreshToken inside
+    const userId = randomUUID();
     const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAccessToken(payload),
-      this.jwtService.signRefreshToken(payload),
-    ]);
+    // We need to generate the payload first, then tokens, then wrap DB ops in transaction
+    // But we need the user to be created first to confirm success before generating tokens
+    // So we'll create user in transaction, generate tokens after, then save session in same tx
+    
+    // Wrap user creation and session creation in a single transaction
+    // If session creation fails, user creation is rolled back
+    const { newUser, accessToken, refreshToken } = await this.database.transaction(async (tx) => {
+      const created = await this.userRepository.create({
+        id: userId,
+        name: dto.name,
+        email: dto.email,
+        password: hashedPassword,
+      }, tx);
 
-    await this.sessionService.saveSession(
-      newUser.id,
-      refreshToken,
-      refreshTokenExpiry,
-      context
-    );
+      if (!created) {
+        throw new InternalError("Failed to create user");
+      }
+
+      const payload: JwtPayload = {
+        sub: created.id,
+        email: created.email,
+      };
+
+      // Generate tokens (these don't involve DB, so safe to do inside tx)
+      const [accessTkn, refreshTkn] = await Promise.all([
+        this.jwtService.signAccessToken(payload),
+        this.jwtService.signRefreshToken(payload),
+      ]);
+
+      // Save session within the same transaction
+      await this.sessionService.saveSession(
+        created.id,
+        refreshTkn,
+        refreshTokenExpiry,
+        context,
+        tx
+      );
+
+      return { newUser: created, accessToken: accessTkn, refreshToken: refreshTkn };
+    });
 
     return { accessToken, refreshToken };
   }

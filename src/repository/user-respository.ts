@@ -5,15 +5,17 @@ import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
 import { DatabaseError } from "@/errors";
+import type { DbOrTransaction } from "@/db";
 
 @injectable()
 export class UserRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewUser): Promise<User | undefined> {
+  async create(data: NewUser, tx?: DbOrTransaction): Promise<User | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [created] = await this.database.insert(user).values(data).returning();
+      const [created] = await db.insert(user).values(data).returning();
       return created;
     } catch (error) {
       console.error("Database error in UserRepository.create:", error);
@@ -21,9 +23,10 @@ export class UserRepository {
     }
   }
 
-  async findById(id: string): Promise<User | undefined> {
+  async findById(id: string, tx?: DbOrTransaction): Promise<User | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(user)
         .where(eq(user.id, id))
@@ -35,9 +38,10 @@ export class UserRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewUser>): Promise<User | undefined> {
+  async update(id: string, data: Partial<NewUser>, tx?: DbOrTransaction): Promise<User | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [updated] = await this.database
+      const [updated] = await db
         .update(user)
         .set({ ...data, updatedAt: new Date() })
         .where(eq(user.id, id))
@@ -49,9 +53,10 @@ export class UserRepository {
     }
   }
 
-  async delete(id: string): Promise<User | undefined> {
+  async delete(id: string, tx?: DbOrTransaction): Promise<User | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [deleted] = await this.database
+      const [deleted] = await db
         .delete(user)
         .where(eq(user.id, id))
         .returning();
@@ -63,9 +68,10 @@ export class UserRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByEmail(email: string): Promise<User | undefined> {
+  async findByEmail(email: string, tx?: DbOrTransaction): Promise<User | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(user)
         .where(eq(user.email, email))

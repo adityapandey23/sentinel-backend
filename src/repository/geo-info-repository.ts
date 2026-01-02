@@ -5,15 +5,17 @@ import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
 import { DatabaseError } from "@/errors";
+import type { DbOrTransaction } from "@/db";
 
 @injectable()
 export class GeoInfoRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewGeoInfo): Promise<GeoInfo | undefined> {
+  async create(data: NewGeoInfo, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [created] = await this.database.insert(geoInfo).values(data).returning();
+      const [created] = await db.insert(geoInfo).values(data).returning();
       return created;
     } catch (error) {
       console.error("Database error in GeoInfoRepository.create:", error);
@@ -21,9 +23,10 @@ export class GeoInfoRepository {
     }
   }
 
-  async findById(id: string): Promise<GeoInfo | undefined> {
+  async findById(id: string, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(geoInfo)
         .where(eq(geoInfo.id, id))
@@ -35,9 +38,10 @@ export class GeoInfoRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewGeoInfo>): Promise<GeoInfo | undefined> {
+  async update(id: string, data: Partial<NewGeoInfo>, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [updated] = await this.database
+      const [updated] = await db
         .update(geoInfo)
         .set({ ...data, updatedAt: new Date() })
         .where(eq(geoInfo.id, id))
@@ -49,9 +53,10 @@ export class GeoInfoRepository {
     }
   }
 
-  async delete(id: string): Promise<GeoInfo | undefined> {
+  async delete(id: string, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [deleted] = await this.database
+      const [deleted] = await db
         .delete(geoInfo)
         .where(eq(geoInfo.id, id))
         .returning();
@@ -63,9 +68,10 @@ export class GeoInfoRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByIp(ip: string): Promise<GeoInfo | undefined> {
+  async findByIp(ip: string, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+    const db = tx ?? this.database;
     try {
-      const [found] = await this.database
+      const [found] = await db
         .select()
         .from(geoInfo)
         .where(eq(geoInfo.ip, ip))

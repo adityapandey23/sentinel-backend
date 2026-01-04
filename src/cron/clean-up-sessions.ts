@@ -18,7 +18,7 @@ baker.add({
         .returning();
 
       console.log(
-        `[Cron] Cleaned up ${deleted.length} expired session(s) at ${now.toISOString()}`
+        `[Cron] Cleaned up ${deleted.length} expired session(s) at ${now.toISOString()}`,
       );
     } catch (error) {
       console.error("[Cron] Error cleaning up expired sessions:", error);

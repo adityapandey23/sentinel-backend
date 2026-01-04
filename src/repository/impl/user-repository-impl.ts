@@ -39,7 +39,11 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewUser>, tx?: DbOrTransaction): Promise<User | undefined> {
+  async update(
+    id: string,
+    data: Partial<NewUser>,
+    tx?: DbOrTransaction,
+  ): Promise<User | undefined> {
     const db = tx ?? this.database;
     try {
       const [updated] = await db
@@ -69,7 +73,10 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByEmail(email: string, tx?: DbOrTransaction): Promise<User | undefined> {
+  async findByEmail(
+    email: string,
+    tx?: DbOrTransaction,
+  ): Promise<User | undefined> {
     const db = tx ?? this.database;
     try {
       const [found] = await db

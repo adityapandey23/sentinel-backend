@@ -16,7 +16,7 @@ export class SessionRepositoryImpl implements SessionRepository {
   // Basic CRUD operation functions
   async create(
     data: NewSession,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
@@ -30,7 +30,7 @@ export class SessionRepositoryImpl implements SessionRepository {
 
   async findById(
     id: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
@@ -45,7 +45,7 @@ export class SessionRepositoryImpl implements SessionRepository {
   async update(
     id: string,
     data: Partial<NewSession>,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
@@ -78,7 +78,7 @@ export class SessionRepositoryImpl implements SessionRepository {
   // Enhanced CRUD operation functions
   async findByUserId(
     userId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<GetSessionResponse[]> {
     const db = tx ?? this.database;
     try {
@@ -109,14 +109,14 @@ export class SessionRepositoryImpl implements SessionRepository {
       console.error("Database error in SessionRepository.findByUserId:", error);
       throw new DatabaseError(
         "Failed to find session by user ID",
-        error as Error
+        error as Error,
       );
     }
   }
 
   async findByToken(
     token: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
@@ -129,7 +129,7 @@ export class SessionRepositoryImpl implements SessionRepository {
       console.error("Database error in SessionRepository.findByToken:", error);
       throw new DatabaseError(
         "Failed to find session by token",
-        error as Error
+        error as Error,
       );
     }
   }
@@ -137,7 +137,7 @@ export class SessionRepositoryImpl implements SessionRepository {
   async deleteByIdAndUserId(
     sessionId: string,
     userId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<boolean> {
     const db = tx ?? this.database;
     try {
@@ -147,7 +147,10 @@ export class SessionRepositoryImpl implements SessionRepository {
         .returning();
       return result.length > 0;
     } catch (error) {
-      console.error("Database error in SessionRepository.deleteByIdAndUserId:", error);
+      console.error(
+        "Database error in SessionRepository.deleteByIdAndUserId:",
+        error,
+      );
       throw new DatabaseError("Failed to delete session", error as Error);
     }
   }
@@ -155,7 +158,7 @@ export class SessionRepositoryImpl implements SessionRepository {
   async deleteAllExcept(
     userId: string,
     exceptSessionId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<number> {
     const db = tx ?? this.database;
     try {
@@ -165,7 +168,10 @@ export class SessionRepositoryImpl implements SessionRepository {
         .returning();
       return result.length;
     } catch (error) {
-      console.error("Database error in SessionRepository.deleteAllExcept:", error);
+      console.error(
+        "Database error in SessionRepository.deleteAllExcept:",
+        error,
+      );
       throw new DatabaseError("Failed to delete sessions", error as Error);
     }
   }

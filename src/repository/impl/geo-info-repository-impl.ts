@@ -13,7 +13,10 @@ export class GeoInfoRepositoryImpl implements GeoInfoRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewGeoInfo, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+  async create(
+    data: NewGeoInfo,
+    tx?: DbOrTransaction,
+  ): Promise<GeoInfo | undefined> {
     const db = tx ?? this.database;
     try {
       const [created] = await db.insert(geoInfo).values(data).returning();
@@ -24,7 +27,10 @@ export class GeoInfoRepositoryImpl implements GeoInfoRepository {
     }
   }
 
-  async findById(id: string, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+  async findById(
+    id: string,
+    tx?: DbOrTransaction,
+  ): Promise<GeoInfo | undefined> {
     const db = tx ?? this.database;
     try {
       const [found] = await db
@@ -39,7 +45,11 @@ export class GeoInfoRepositoryImpl implements GeoInfoRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewGeoInfo>, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+  async update(
+    id: string,
+    data: Partial<NewGeoInfo>,
+    tx?: DbOrTransaction,
+  ): Promise<GeoInfo | undefined> {
     const db = tx ?? this.database;
     try {
       const [updated] = await db
@@ -69,7 +79,10 @@ export class GeoInfoRepositoryImpl implements GeoInfoRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByIp(ip: string, tx?: DbOrTransaction): Promise<GeoInfo | undefined> {
+  async findByIp(
+    ip: string,
+    tx?: DbOrTransaction,
+  ): Promise<GeoInfo | undefined> {
     const db = tx ?? this.database;
     try {
       const [found] = await db

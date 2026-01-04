@@ -11,7 +11,6 @@ import type { interfaces } from "inversify-express-utils";
 import type { Request, Response } from "express";
 import type { AuthService } from "@/service/auth-service.interface";
 import type { SessionContext } from "@/service/session-service.interface";
-import { sessionUpdateMiddleware } from "@/middleware/session-update-middleware";
 
 @controller("/api/auth")
 export class AuthController implements interfaces.Controller {
@@ -19,7 +18,7 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/register")
   private async register(@request() req: Request, @response() res: Response) {
-    const context = <SessionContext> {
+    const context = <SessionContext>{
       ip: req.ip,
       userAgent: req.useragent,
     };
@@ -33,7 +32,7 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/login")
   private async login(@request() req: Request, @response() res: Response) {
-    const context = <SessionContext> {
+    const context = <SessionContext>{
       ip: req.ip,
       userAgent: req.useragent,
     };

@@ -2,7 +2,11 @@ export class AppError extends Error {
   public readonly status: number;
   public readonly isOperational: boolean;
 
-  constructor(message: string, status: number = 500, isOperational: boolean = true) {
+  constructor(
+    message: string,
+    status: number = 500,
+    isOperational: boolean = true,
+  ) {
     super(message);
     this.status = status;
     this.isOperational = isOperational; // operational = expected errors (user input, not found, etc.)
@@ -49,7 +53,10 @@ export class InternalError extends AppError {
 export class DatabaseError extends AppError {
   public readonly originalError?: Error;
 
-  constructor(message: string = "Database operation failed", originalError?: Error) {
+  constructor(
+    message: string = "Database operation failed",
+    originalError?: Error,
+  ) {
     super(message, 500, false); // isOperational = false since this is unexpected
     this.originalError = originalError;
   }

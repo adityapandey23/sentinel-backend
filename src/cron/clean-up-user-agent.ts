@@ -15,12 +15,12 @@ baker.add({
       const deleted = await db
         .delete(userAgent)
         .where(
-          sql`NOT EXISTS (SELECT 1 FROM session WHERE session.user_agent_id = ${userAgent.id})`
+          sql`NOT EXISTS (SELECT 1 FROM session WHERE session.user_agent_id = ${userAgent.id})`,
         )
         .returning();
 
       console.log(
-        `[Cron] Cleaned up ${deleted.length} orphaned user agent record(s) at ${now.toISOString()}`
+        `[Cron] Cleaned up ${deleted.length} orphaned user agent record(s) at ${now.toISOString()}`,
       );
     } catch (error) {
       console.error("[Cron] Error cleaning up orphaned user agents:", error);

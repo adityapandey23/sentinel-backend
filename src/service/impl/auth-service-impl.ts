@@ -9,9 +9,17 @@ import { inject, injectable } from "inversify";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { JwtPayload, JwtService } from "../jwt-service.interface";
 import { randomUUID } from "crypto";
-import type { SessionContext, SessionService } from "../session-service.interface";
+import type {
+  SessionContext,
+  SessionService,
+} from "../session-service.interface";
 import type { UserRepository } from "@/repository/user-respository";
-import { ConflictError, InternalError, NotFoundError, UnauthorizedError } from "@/errors";
+import {
+  ConflictError,
+  InternalError,
+  NotFoundError,
+  UnauthorizedError,
+} from "@/errors";
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
@@ -20,7 +28,7 @@ export class AuthServiceImpl implements AuthService {
 
     @inject(TYPES.Database) private database: NodePgDatabase,
     @inject(TYPES.JwtService) private jwtService: JwtService,
-    @inject(TYPES.SessionService) private sessionService: SessionService
+    @inject(TYPES.SessionService) private sessionService: SessionService,
   ) {}
 
   async login(dto: LoginDto, context: SessionContext): Promise<TokenPayload> {
@@ -32,7 +40,7 @@ export class AuthServiceImpl implements AuthService {
 
     const isValidPassword = await Bun.password.verify(
       dto.password,
-      existingUser.password
+      existingUser.password,
     );
 
     if (!isValidPassword) {
@@ -67,14 +75,17 @@ export class AuthServiceImpl implements AuthService {
         refreshToken,
         refreshTokenExpiry,
         context,
-        tx
+        tx,
       );
     });
 
     return { accessToken, refreshToken };
   }
 
-  async register(dto: RegisterDto, context: SessionContext): Promise<TokenPayload> {
+  async register(
+    dto: RegisterDto,
+    context: SessionContext,
+  ): Promise<TokenPayload> {
     const existingUser = await this.userRepository.findByEmail(dto.email);
 
     if (existingUser) {
@@ -91,45 +102,53 @@ export class AuthServiceImpl implements AuthService {
     // We need to generate the payload first, then tokens, then wrap DB ops in transaction
     // But we need the user to be created first to confirm success before generating tokens
     // So we'll create user in transaction, generate tokens after, then save session in same tx
-    
+
     // Wrap user creation and session creation in a single transaction
     // If session creation fails, user creation is rolled back
-    const { newUser, accessToken, refreshToken } = await this.database.transaction(async (tx) => {
-      const created = await this.userRepository.create({
-        id: userId,
-        name: dto.name,
-        email: dto.email,
-        password: hashedPassword,
-      }, tx);
+    const { newUser, accessToken, refreshToken } =
+      await this.database.transaction(async (tx) => {
+        const created = await this.userRepository.create(
+          {
+            id: userId,
+            name: dto.name,
+            email: dto.email,
+            password: hashedPassword,
+          },
+          tx,
+        );
 
-      if (!created) {
-        throw new InternalError("Failed to create user");
-      }
+        if (!created) {
+          throw new InternalError("Failed to create user");
+        }
 
-      const payload: JwtPayload = {
-        sub: created.id,
-        email: created.email,
-        sid: sessionId,
-      };
+        const payload: JwtPayload = {
+          sub: created.id,
+          email: created.email,
+          sid: sessionId,
+        };
 
-      // Generate tokens (these don't involve DB, so safe to do inside tx)
-      const [accessTkn, refreshTkn] = await Promise.all([
-        this.jwtService.signAccessToken(payload),
-        this.jwtService.signRefreshToken(payload),
-      ]);
+        // Generate tokens (these don't involve DB, so safe to do inside tx)
+        const [accessTkn, refreshTkn] = await Promise.all([
+          this.jwtService.signAccessToken(payload),
+          this.jwtService.signRefreshToken(payload),
+        ]);
 
-      // Save session within the same transaction
-      await this.sessionService.saveSession(
-        created.id,
-        sessionId,
-        refreshTkn,
-        refreshTokenExpiry,
-        context,
-        tx
-      );
+        // Save session within the same transaction
+        await this.sessionService.saveSession(
+          created.id,
+          sessionId,
+          refreshTkn,
+          refreshTokenExpiry,
+          context,
+          tx,
+        );
 
-      return { newUser: created, accessToken: accessTkn, refreshToken: refreshTkn };
-    });
+        return {
+          newUser: created,
+          accessToken: accessTkn,
+          refreshToken: refreshTkn,
+        };
+      });
 
     return { accessToken, refreshToken };
   }

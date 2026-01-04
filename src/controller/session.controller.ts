@@ -26,7 +26,7 @@ export class SessionController implements interfaces.Controller {
   @httpGet("/")
   private async getSessions(
     @request() req: Request,
-    @response() res: Response
+    @response() res: Response,
   ) {
     const userId = req.user!.userId;
     const currentSessionId = req.user!.sessionId;
@@ -34,20 +34,20 @@ export class SessionController implements interfaces.Controller {
     const sessions = await this.sessionService.getSessions(userId);
 
     // Mark the current session in the response
-    const sessionsWithCurrent = sessions.map(session => ({
+    const sessionsWithCurrent = sessions.map((session) => ({
       ...session,
-      isCurrent: session.sessionId === currentSessionId
+      isCurrent: session.sessionId === currentSessionId,
     }));
 
     res.json({
-      sessions: sessionsWithCurrent
+      sessions: sessionsWithCurrent,
     });
   }
 
   @httpDelete("/others")
   private async deleteSessionsExceptCurrent(
     @request() req: Request,
-    @response() res: Response
+    @response() res: Response,
   ) {
     const userId = req.user!.userId;
     const currentSessionId = req.user!.sessionId;
@@ -56,11 +56,14 @@ export class SessionController implements interfaces.Controller {
       throw new BadRequestError("Session ID not found in token");
     }
 
-    const deletedCount = await this.sessionService.deleteAllSessionsExcept(userId, currentSessionId);
+    const deletedCount = await this.sessionService.deleteAllSessionsExcept(
+      userId,
+      currentSessionId,
+    );
 
     res.json({
       message: "Other sessions revoked successfully",
-      deletedCount
+      deletedCount,
     });
   }
 
@@ -68,14 +71,16 @@ export class SessionController implements interfaces.Controller {
   private async deleteSessionById(
     @requestParam("id") id: string,
     @request() req: Request,
-    @response() res: Response
+    @response() res: Response,
   ) {
     const userId = req.user!.userId;
     const currentSessionId = req.user!.sessionId;
 
     // Prevent user from deleting their current session via this endpoint
     if (id === currentSessionId) {
-      throw new BadRequestError("Cannot revoke current session. Use logout instead.");
+      throw new BadRequestError(
+        "Cannot revoke current session. Use logout instead.",
+      );
     }
 
     const deleted = await this.sessionService.deleteSession(userId, id);
@@ -85,7 +90,7 @@ export class SessionController implements interfaces.Controller {
     }
 
     res.json({
-      message: "Session revoked successfully"
+      message: "Session revoked successfully",
     });
   }
 }

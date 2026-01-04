@@ -33,7 +33,7 @@
     // Alias for paths
     "baseUrl": "src",
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./*"]
     }
   }
 }

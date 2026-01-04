@@ -1,7 +1,7 @@
-import { app } from "./src/app"
+import { app } from "./src/app";
 
-const PORT = 8000
+const PORT = 8000;
 
 app.listen(PORT, () => {
-    console.log(`Listening on port: ${PORT}`);
-})
+  console.log(`Listening on port: ${PORT}`);
+});

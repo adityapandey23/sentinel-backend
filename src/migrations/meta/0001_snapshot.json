@@ -82,9 +82,7 @@
         "geo_info_ip_unique": {
           "name": "geo_info_ip_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "ip"
-          ]
+          "columns": ["ip"]
         }
       },
       "policies": {},
@@ -150,12 +148,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -163,12 +157,8 @@
           "name": "session_geo_info_id_geo_info_id_fk",
           "tableFrom": "session",
           "tableTo": "geo_info",
-          "columnsFrom": [
-            "geo_info_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["geo_info_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -176,12 +166,8 @@
           "name": "session_user_agent_id_user_agent_id_fk",
           "tableFrom": "session",
           "tableTo": "user_agent",
-          "columnsFrom": [
-            "user_agent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_agent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -191,9 +177,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -248,9 +232,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},

@@ -5,16 +5,18 @@
   "private": true,
   "scripts": {
     "dev": "bun run index.ts",
+    "format": "bunx prettier . --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
     "@types/bun": "latest",
+    "@types/express": "^4.17.21",
     "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.8",
+    "prettier": "^3.7.4",
     "tsx": "^4.21.0"
   },
   "peerDependencies": {

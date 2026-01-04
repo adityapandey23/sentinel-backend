@@ -10,7 +10,7 @@ export class CacheServiceImpl implements CacheService {
   client: RedisClient;
 
   constructor(
-    @inject(TYPES.ConfigService) private configService: ConfigService
+    @inject(TYPES.ConfigService) private configService: ConfigService,
   ) {
     this.client = new RedisClient(configService.get("REDIS_URL"));
   }
@@ -18,7 +18,7 @@ export class CacheServiceImpl implements CacheService {
   async setValue(
     key: string,
     value: string,
-    ttlSeconds?: number
+    ttlSeconds?: number,
   ): Promise<string> {
     if (ttlSeconds) {
       return await this.client.set(key, value, "EX", ttlSeconds);

@@ -17,38 +17,38 @@ export interface SessionService {
     refreshToken: string,
     expiresAt: Date,
     context: SessionContext,
-    tx?: DbOrTransaction
-  ): Promise<void>; 
+    tx?: DbOrTransaction,
+  ): Promise<void>;
 
   // This needs to be called somewhere in the middleware maybe ?
   updateSession(
     sessionId: string,
     data: Partial<Session>,
-    tx?: DbOrTransaction
-  ): Promise<void>; 
+    tx?: DbOrTransaction,
+  ): Promise<void>;
 
   // This method is just to update the updatedAt timestamp
   updateLastActiveDetails(
     sessionId: string,
-    tx?: DbOrTransaction
-  ): Promise<void>
+    tx?: DbOrTransaction,
+  ): Promise<void>;
 
   getSessions(
     userId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<GetSessionResponse[]>;
 
   // Delete a specific session by ID (for revoking a specific session)
   deleteSession(
     userId: string,
     sessionId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<boolean>;
 
   // Delete all sessions except the current one
   deleteAllSessionsExcept(
     userId: string,
     currentSessionId: string,
-    tx?: DbOrTransaction
+    tx?: DbOrTransaction,
   ): Promise<number>;
 }

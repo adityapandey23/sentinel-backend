@@ -15,12 +15,12 @@ baker.add({
       const deleted = await db
         .delete(geoInfo)
         .where(
-          sql`NOT EXISTS (SELECT 1 FROM session WHERE session.geo_info_id = ${geoInfo.id})`
+          sql`NOT EXISTS (SELECT 1 FROM session WHERE session.geo_info_id = ${geoInfo.id})`,
         )
         .returning();
 
       console.log(
-        `[Cron] Cleaned up ${deleted.length} orphaned geo info record(s) at ${now.toISOString()}`
+        `[Cron] Cleaned up ${deleted.length} orphaned geo info record(s) at ${now.toISOString()}`,
       );
     } catch (error) {
       console.error("[Cron] Error cleaning up orphaned geo info:", error);

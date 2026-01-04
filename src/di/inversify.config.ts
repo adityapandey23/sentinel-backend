@@ -43,9 +43,15 @@ container.bind<JwtService>(TYPES.JwtService).to(JwtServiceImpl);
 container.bind<SessionService>(TYPES.SessionService).to(SessionServiceImpl);
 
 // Binding Repository to the container
-container.bind<GeoInfoRepository>(TYPES.GeoInfoRepository).to(GeoInfoRepositoryImpl);
-container.bind<SessionRepository>(TYPES.SessionRepository).to(SessionRepositoryImpl);
-container.bind<UserAgentRepository>(TYPES.UserAgentRepository).to(UserAgentRepositoryImpl);
+container
+  .bind<GeoInfoRepository>(TYPES.GeoInfoRepository)
+  .to(GeoInfoRepositoryImpl);
+container
+  .bind<SessionRepository>(TYPES.SessionRepository)
+  .to(SessionRepositoryImpl);
+container
+  .bind<UserAgentRepository>(TYPES.UserAgentRepository)
+  .to(UserAgentRepositoryImpl);
 container.bind<UserRepository>(TYPES.UserRepository).to(UserRepositoryImpl);
 
 export { container };

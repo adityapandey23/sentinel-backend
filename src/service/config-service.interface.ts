@@ -1,3 +1,3 @@
 export interface ConfigService {
-    get(key: string): string
+  get(key: string): string;
 }

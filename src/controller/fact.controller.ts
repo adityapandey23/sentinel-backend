@@ -16,11 +16,8 @@ export class FactController implements interfaces.Controller {
   constructor() {}
 
   @httpGet("/")
-  private getFacts(
-    @request() req: Request,
-    @response() res: Response
-  ) {
+  private getFacts(@request() req: Request, @response() res: Response) {
     const tip = getRandomCpTip();
-    res.json({ "Tip": tip });
+    res.json({ Tip: tip });
   }
 }

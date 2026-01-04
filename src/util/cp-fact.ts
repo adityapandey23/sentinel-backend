@@ -8,7 +8,7 @@ const competitiveProgrammingTips: string[] = [
   "Breaking logic into small helper functions reduces mistakes and improves readability.",
   "Master one language deeply instead of switching between many languages.",
   "Upsolving after contests is where real improvement happens.",
-  "Most wrong answers come from logical mistakes, not syntax errors."
+  "Most wrong answers come from logical mistakes, not syntax errors.",
 ];
 
 const getRandomDigit = (): number =>
@@ -18,6 +18,6 @@ export const getRandomCpTip = (): { index: number; tip: string } => {
   const index = getRandomDigit();
   return {
     index,
-    tip: competitiveProgrammingTips[index] as string
+    tip: competitiveProgrammingTips[index] as string,
   };
 };

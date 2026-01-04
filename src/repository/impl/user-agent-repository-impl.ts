@@ -13,7 +13,10 @@ export class UserAgentRepositoryImpl implements UserAgentRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewUserAgent, tx?: DbOrTransaction): Promise<UserAgent | undefined> {
+  async create(
+    data: NewUserAgent,
+    tx?: DbOrTransaction,
+  ): Promise<UserAgent | undefined> {
     const db = tx ?? this.database;
     try {
       const [created] = await db.insert(userAgent).values(data).returning();
@@ -24,7 +27,10 @@ export class UserAgentRepositoryImpl implements UserAgentRepository {
     }
   }
 
-  async findById(id: string, tx?: DbOrTransaction): Promise<UserAgent | undefined> {
+  async findById(
+    id: string,
+    tx?: DbOrTransaction,
+  ): Promise<UserAgent | undefined> {
     const db = tx ?? this.database;
     try {
       const [found] = await db
@@ -35,11 +41,18 @@ export class UserAgentRepositoryImpl implements UserAgentRepository {
       return found;
     } catch (error) {
       console.error("Database error in UserAgentRepository.findById:", error);
-      throw new DatabaseError("Failed to find user agent by ID", error as Error);
+      throw new DatabaseError(
+        "Failed to find user agent by ID",
+        error as Error,
+      );
     }
   }
 
-  async update(id: string, data: Partial<NewUserAgent>, tx?: DbOrTransaction): Promise<UserAgent | undefined> {
+  async update(
+    id: string,
+    data: Partial<NewUserAgent>,
+    tx?: DbOrTransaction,
+  ): Promise<UserAgent | undefined> {
     const db = tx ?? this.database;
     try {
       const [updated] = await db
@@ -54,7 +67,10 @@ export class UserAgentRepositoryImpl implements UserAgentRepository {
     }
   }
 
-  async delete(id: string, tx?: DbOrTransaction): Promise<UserAgent | undefined> {
+  async delete(
+    id: string,
+    tx?: DbOrTransaction,
+  ): Promise<UserAgent | undefined> {
     const db = tx ?? this.database;
     try {
       const [deleted] = await db

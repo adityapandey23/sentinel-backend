@@ -12,14 +12,14 @@ export class JwtServiceImpl implements JwtService {
   private refreshTokenExpiry: string;
 
   constructor(
-    @inject(TYPES.ConfigService) private configService: ConfigService
+    @inject(TYPES.ConfigService) private configService: ConfigService,
   ) {
     this.accessTokenSecret = new TextEncoder().encode(
-      this.configService.get("JWT_ACCESS_SECRET")
+      this.configService.get("JWT_ACCESS_SECRET"),
     );
 
     this.refreshTokenSecret = new TextEncoder().encode(
-      this.configService.get("JWT_REFRESH_SECRET")
+      this.configService.get("JWT_REFRESH_SECRET"),
     );
 
     this.accessTokenExpiry = "15m";

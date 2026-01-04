@@ -7,12 +7,12 @@ import type { Request, Response, NextFunction } from "express";
 export async function authMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const authHeader = req.headers.authorization;
 
-    if(!authHeader?.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       throw new UnauthorizedError("Invalid or expired token");
     }
 
@@ -25,11 +25,11 @@ export async function authMiddleware(
     req.user = {
       userId: payload.sub,
       email: payload.email,
-      sessionId: payload.sid
-    }
+      sessionId: payload.sid,
+    };
 
     next();
-  } catch(error) {
+  } catch (error) {
     next(new UnauthorizedError("Invalid or expired token"));
   }
 }

@@ -1,17 +1,17 @@
 type IpApiSuccess = {
-  status: 'success',
-  countryCode: string,
-  region: string,
-  city: string,
-  lat: number,
-  lon: number,
-  timezone: string,
-  offset: number
+  status: "success";
+  countryCode: string;
+  region: string;
+  city: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+  offset: number;
 };
 
 type IpApiFail = {
-  status: 'fail',
-  message: string
+  status: "fail";
+  message: string;
 };
 
 export type IpApiResponse = IpApiSuccess | IpApiFail;

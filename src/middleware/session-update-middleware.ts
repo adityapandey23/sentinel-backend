@@ -8,7 +8,7 @@ import type { Request, Response, NextFunction } from "express";
 export async function sessionUpdateMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const cacheService = container.get<CacheService>(TYPES.CacheService);

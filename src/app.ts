@@ -35,7 +35,7 @@ server.setErrorConfig((app) => {
   app.use((req: Request, res: Response, next: NextFunction) => {
     const error = Object.assign(
       new Error(`Cannot find ${req.originalUrl} on this server`),
-      { status: 404 }
+      { status: 404 },
     );
     next(error);
   });
@@ -46,7 +46,7 @@ server.setErrorConfig((app) => {
       err: Error & { status: number; isOperational?: boolean },
       req: Request,
       res: Response,
-      next: NextFunction
+      next: NextFunction,
     ) => {
       const configService = container.get<ConfigService>(TYPES.ConfigService);
       const isDev = configService.get("NODE_ENV") === "development";
@@ -61,7 +61,7 @@ server.setErrorConfig((app) => {
         message: err.isOperational ? err.message : "Something went wrong",
         ...(isDev && { stack: err.stack }),
       });
-    }
+    },
   );
 });
 

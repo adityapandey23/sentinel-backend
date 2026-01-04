@@ -1,4 +1,4 @@
-export type SessionResponse = {
+export type GetSessionResponse = {
   sessionId: string;
 
   // Geo info (nullable due to leftJoin)

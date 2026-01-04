@@ -1,7 +1,7 @@
 import { geoInfo, session, userAgent } from "@/db/schema";
 import { TYPES } from "@/di/types";
 import type { NewSession, Session } from "@/model";
-import type { SessionResponse } from "@/dto/session-response";
+import type { GetSessionResponse } from "@/dto/session-response";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
@@ -92,7 +92,7 @@ export class SessionRepository {
   async findByUserId(
     userId: string,
     tx?: DbOrTransaction
-  ): Promise<SessionResponse[]> {
+  ): Promise<GetSessionResponse[]> {
     const db = tx ?? this.database;
     try {
       const found = await db

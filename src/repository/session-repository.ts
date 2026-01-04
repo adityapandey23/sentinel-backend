@@ -1,6 +1,7 @@
-import { session } from "@/db/schema";
+import { geoInfo, session, userAgent } from "@/db/schema";
 import { TYPES } from "@/di/types";
 import type { NewSession, Session } from "@/model";
+import type { SessionResponse } from "@/dto/session-response";
 import { eq } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
@@ -12,7 +13,10 @@ export class SessionRepository {
   constructor(@inject(TYPES.Database) private database: NodePgDatabase) {}
 
   // Basic CRUD operation functions
-  async create(data: NewSession, tx?: DbOrTransaction): Promise<Session | undefined> {
+  async create(
+    data: NewSession,
+    tx?: DbOrTransaction
+  ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
       const [created] = await db.insert(session).values(data).returning();
@@ -23,13 +27,13 @@ export class SessionRepository {
     }
   }
 
-  async findById(id: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+  async findById(
+    id: string,
+    tx?: DbOrTransaction
+  ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
-      const [found] = await db
-        .select()
-        .from(session)
-        .where(eq(session.id, id));
+      const [found] = await db.select().from(session).where(eq(session.id, id));
       return found;
     } catch (error) {
       console.error("Database error in SessionRepository.findById:", error);
@@ -37,7 +41,11 @@ export class SessionRepository {
     }
   }
 
-  async update(id: string, data: Partial<NewSession>, tx?: DbOrTransaction): Promise<Session | undefined> {
+  async update(
+    id: string,
+    data: Partial<NewSession>,
+    tx?: DbOrTransaction
+  ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
       const [updated] = await db
@@ -67,21 +75,62 @@ export class SessionRepository {
   }
 
   // Enhanced CRUD operation functions
-  async findByUserId(userId: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+  // async findByUserId(userId: string, tx?: DbOrTransaction): Promise<Session[] | undefined> {
+  //   const db = tx ?? this.database;
+  //   try {
+  //     const found = await db
+  //       .select()
+  //       .from(session)
+  //       .where(eq(session.userId, userId));
+  //     return found;
+  //   } catch (error) {
+  //     console.error("Database error in SessionRepository.findByUserId:", error);
+  //     throw new DatabaseError("Failed to find session by user ID", error as Error);
+  //   }
+  // }
+
+  async findByUserId(
+    userId: string,
+    tx?: DbOrTransaction
+  ): Promise<SessionResponse[]> {
     const db = tx ?? this.database;
     try {
-      const [found] = await db
-        .select()
+      const found = await db
+        .select({
+          sessionId: session.id,
+
+          ip: geoInfo.ip,
+          countryCode: geoInfo.countryCode,
+          region: geoInfo.region,
+          cityCode: geoInfo.city,
+          latitude: geoInfo.latitude,
+          longitude: geoInfo.longitude,
+          timezone: geoInfo.timezone,
+          offset: geoInfo.offset,
+
+          browser: userAgent.browser,
+          os: userAgent.operatingSystem,
+          isMobile: userAgent.isMobile,
+          platform: userAgent.platform,
+        })
         .from(session)
+        .leftJoin(geoInfo, eq(session.geoInfoId, geoInfo.id))
+        .leftJoin(userAgent, eq(session.userAgentId, userAgent.id))
         .where(eq(session.userId, userId));
       return found;
     } catch (error) {
       console.error("Database error in SessionRepository.findByUserId:", error);
-      throw new DatabaseError("Failed to find session by user ID", error as Error);
+      throw new DatabaseError(
+        "Failed to find session by user ID",
+        error as Error
+      );
     }
   }
 
-  async findByToken(token: string, tx?: DbOrTransaction): Promise<Session | undefined> {
+  async findByToken(
+    token: string,
+    tx?: DbOrTransaction
+  ): Promise<Session | undefined> {
     const db = tx ?? this.database;
     try {
       const [found] = await db
@@ -91,7 +140,10 @@ export class SessionRepository {
       return found;
     } catch (error) {
       console.error("Database error in SessionRepository.findByToken:", error);
-      throw new DatabaseError("Failed to find session by token", error as Error);
+      throw new DatabaseError(
+        "Failed to find session by token",
+        error as Error
+      );
     }
   }
 }

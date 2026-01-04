@@ -8,17 +8,17 @@ services:
     ports:
       - "5432:5432"
 
-  cache:
-    image: valkey/valkey
-    ports:
-      - "6379:6379"
+  # cache:
+  #   image: valkey/valkey
+  #   ports:
+  #     - "6379:6379"
 
-  rabbitmq:
-    image: rabbitmq:management-alpine
-    hostname: my-rabbit
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+  # rabbitmq:
+  #   image: rabbitmq:management-alpine
+  #   hostname: my-rabbit
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest

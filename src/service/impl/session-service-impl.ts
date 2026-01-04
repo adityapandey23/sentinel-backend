@@ -8,6 +8,7 @@ import type { IpService } from "../ip-service.interface";
 import { createHash, randomUUID } from "crypto";
 import type { AgentDetails } from "express-useragent";
 import type { DbOrTransaction } from "@/db";
+import type { SessionResponse } from "@/dto/session-response";
 
 @injectable()
 export class SessionServiceImpl implements SessionService {
@@ -42,7 +43,13 @@ export class SessionServiceImpl implements SessionService {
 
   }
 
-  async getSessions(): Promise<void> {}
+  // async getSessions(userId: string, tx?: DbOrTransaction): Promise<Session[] | undefined> {
+  //   return await this.sessionRepository.findByUserId(userId);
+  // }
+
+  async getSessions(userId: string, tx?: DbOrTransaction): Promise<SessionResponse[]> {
+    return await this.sessionRepository.findByUserId(userId);
+  }
 
   async updateSession(): Promise<void> {}
 

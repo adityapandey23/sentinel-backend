@@ -12,11 +12,12 @@ import { TYPES } from "@/di/types";
 import type { interfaces } from "inversify-express-utils";
 import type { Request, Response } from "express";
 import type { SessionService } from "@/service/session-service.interface";
+import { authMiddleware } from "@/middleware/auth-middleware";
 
-@controller("/api/sessions")
+@controller("/api/sessions", authMiddleware)
 export class SessionController implements interfaces.Controller {
   constructor(
-    @inject(TYPES.SessionService) private sessionService: SessionService
+    @inject(TYPES.SessionService) private sessionService: SessionService,
   ) {}
 
   @httpGet("/")
@@ -24,20 +25,29 @@ export class SessionController implements interfaces.Controller {
     @request() req: Request,
     @response() res: Response
   ) {
+
+    const userId = req.user!.userId;
+
+    const response = await this.sessionService.getSessions(userId);
+
     res.json({
-      message: "Got the sessions",
+      userId,
+      response
     });
   }
-
 
   @httpDelete("/others")
   private async deleteSessionsExceptCurrent(
     @request() req: Request,
     @response() res: Response
   ) {
-    console.log(req.ip);
-    console.log(req.ips);
+    const userId = req.user!.userId;
+    const email = req.user!.email;
+
     res.json({
+      userId,
+      email,
+      Ip: req.ip,
       message: "Other sessions deleted",
     });
   }
@@ -48,10 +58,14 @@ export class SessionController implements interfaces.Controller {
     @request() req: Request,
     @response() res: Response
   ) {
-    console.log(id);
+    const userId = req.user!.userId;
+    const email = req.user!.email;
+
     res.json({
-      message: "Session deleted",
+      userId,
+      email,
+      Ip: req.ip,
+      message: "Sessions deleted",
     });
   }
-
 }

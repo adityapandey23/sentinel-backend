@@ -21,11 +21,17 @@ import { JwtServiceImpl } from "@/service/impl/jwt-service-impl";
 import { QueueServiceImpl } from "@/service/impl/queue-service-impl";
 import { SessionServiceImpl } from "@/service/impl/session-service-impl";
 
+// Importing Repository Interfaces
+import type { GeoInfoRepository } from "@/repository/geo-info-repository";
+import type { SessionRepository } from "@/repository/session-repository";
+import type { UserAgentRepository } from "@/repository/user-agent-repository";
+import type { UserRepository } from "@/repository/user-respository";
+
 // Importing Repository Implementations
-import { GeoInfoRepository } from "@/repository/geo-info-repository"; 
-import { SessionRepository } from "@/repository/session-repository";
-import { UserAgentRepository } from "@/repository/user-agent-repository";
-import { UserRepository } from "@/repository/user-respository";
+import { GeoInfoRepositoryImpl } from "@/repository/impl/geo-info-repository-impl";
+import { SessionRepositoryImpl } from "@/repository/impl/session-repository-impl";
+import { UserAgentRepositoryImpl } from "@/repository/impl/user-agent-repository-impl";
+import { UserRepositoryImpl } from "@/repository/impl/user-repository-impl";
 
 const container = new Container();
 
@@ -40,9 +46,9 @@ container.bind<QueueService>(TYPES.QueueService).to(QueueServiceImpl);
 container.bind<SessionService>(TYPES.SessionService).to(SessionServiceImpl);
 
 // Binding Repository to the container
-container.bind<GeoInfoRepository>(TYPES.GeoInfoRepository).to(GeoInfoRepository);
-container.bind<SessionRepository>(TYPES.SessionRepository).to(SessionRepository);
-container.bind<UserAgentRepository>(TYPES.UserAgentRepository).to(UserAgentRepository);
-container.bind<UserRepository>(TYPES.UserRepository).to(UserRepository);
+container.bind<GeoInfoRepository>(TYPES.GeoInfoRepository).to(GeoInfoRepositoryImpl);
+container.bind<SessionRepository>(TYPES.SessionRepository).to(SessionRepositoryImpl);
+container.bind<UserAgentRepository>(TYPES.UserAgentRepository).to(UserAgentRepositoryImpl);
+container.bind<UserRepository>(TYPES.UserRepository).to(UserRepositoryImpl);
 
 export { container };

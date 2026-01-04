@@ -46,6 +46,7 @@ server.setErrorConfig((app) => {
       err: Error & { status: number; isOperational?: boolean },
       req: Request,
       res: Response,
+      // eslint-disable-next-line
       next: NextFunction,
     ) => {
       const configService = container.get<ConfigService>(TYPES.ConfigService);

@@ -30,6 +30,7 @@ export async function authMiddleware(
 
     next();
   } catch (error) {
+    console.error("An error has occured", error);
     next(new UnauthorizedError("Invalid or expired token"));
   }
 }

@@ -54,7 +54,8 @@ export class SessionServiceImpl implements SessionService {
 
   async getSessions(
     userId: string,
-    tx?: DbOrTransaction,
+    // eslint-disable-next-line
+    tx?: DbOrTransaction, // SHUTUP eslint
   ): Promise<GetSessionResponse[]> {
     return await this.sessionRepository.findByUserId(userId);
   }

@@ -105,8 +105,8 @@ export class AuthServiceImpl implements AuthService {
 
     // Wrap user creation and session creation in a single transaction
     // If session creation fails, user creation is rolled back
-    const { newUser, accessToken, refreshToken } =
-      await this.database.transaction(async (tx) => {
+    const { accessToken, refreshToken } = await this.database.transaction(
+      async (tx) => {
         const created = await this.userRepository.create(
           {
             id: userId,
@@ -148,7 +148,8 @@ export class AuthServiceImpl implements AuthService {
           accessToken: accessTkn,
           refreshToken: refreshTkn,
         };
-      });
+      },
+    );
 
     return { accessToken, refreshToken };
   }

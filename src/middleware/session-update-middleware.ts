@@ -28,6 +28,7 @@ export async function sessionUpdateMiddleware(
 
     next();
   } catch (error) {
+    console.error("An error has occured", error);
     next(new InternalError("Cache service is down"));
   }
 }

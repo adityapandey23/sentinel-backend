@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import type { JwtPayload, JwtService } from "../jwt-service.interface";
 import { TYPES } from "@/di/types";
 import type { ConfigService } from "../config-service.interface";
-import { decodeJwt, jwtVerify, SignJWT, type JWTPayload } from "jose";
+import { jwtVerify, SignJWT, type JWTPayload } from "jose";
 
 @injectable()
 export class JwtServiceImpl implements JwtService {

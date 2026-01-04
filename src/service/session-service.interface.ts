@@ -1,6 +1,7 @@
 import type { AgentDetails } from "express-useragent";
 import type { DbOrTransaction } from "@/db";
 import type { GetSessionResponse } from "@/dto/session-response";
+import type { Session } from "@/model";
 
 export interface SessionContext {
   ip: string;
@@ -20,7 +21,17 @@ export interface SessionService {
   ): Promise<void>; 
 
   // This needs to be called somewhere in the middleware maybe ?
-  updateSession(sessionId: string, tx?: DbOrTransaction): Promise<void>; 
+  updateSession(
+    sessionId: string,
+    data: Partial<Session>,
+    tx?: DbOrTransaction
+  ): Promise<void>; 
+
+  // This method is just to update the updatedAt timestamp
+  updateLastActiveDetails(
+    sessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<void>
 
   getSessions(
     userId: string,

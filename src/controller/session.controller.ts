@@ -14,13 +14,15 @@ import type { Request, Response } from "express";
 import type { SessionService } from "@/service/session-service.interface";
 import { authMiddleware } from "@/middleware/auth-middleware";
 import { BadRequestError, NotFoundError } from "@/errors";
+import { sessionUpdateMiddleware } from "@/middleware/session-update-middleware";
 
-@controller("/api/sessions", authMiddleware)
+@controller("/api/sessions", authMiddleware, sessionUpdateMiddleware)
 export class SessionController implements interfaces.Controller {
   constructor(
     @inject(TYPES.SessionService) private sessionService: SessionService,
   ) {}
 
+  // TODO: Could add pagination as well
   @httpGet("/")
   private async getSessions(
     @request() req: Request,

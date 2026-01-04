@@ -11,6 +11,7 @@ import type { interfaces } from "inversify-express-utils";
 import type { Request, Response } from "express";
 import type { AuthService } from "@/service/auth-service.interface";
 import type { SessionContext } from "@/service/session-service.interface";
+import { sessionUpdateMiddleware } from "@/middleware/session-update-middleware";
 
 @controller("/api/auth")
 export class AuthController implements interfaces.Controller {

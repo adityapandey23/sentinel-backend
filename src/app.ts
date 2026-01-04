@@ -10,6 +10,7 @@ import { container } from "./di/inversify.config";
 
 import "./controller/auth.controller";
 import "./controller/session.controller";
+import "./controller/fact.controller";
 
 import type { ConfigService } from "./service/config-service.interface";
 import { TYPES } from "./di/types";

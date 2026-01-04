@@ -4,8 +4,6 @@ import { UnauthorizedError } from "@/errors";
 import type { JwtService } from "@/service/jwt-service.interface";
 import type { Request, Response, NextFunction } from "express";
 
-// TODO: Add the last updated logic via redis cache
-
 export async function authMiddleware(
   req: Request,
   res: Response,

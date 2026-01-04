@@ -9,7 +9,6 @@ import type { CacheService } from "@/service/cache-service.interface";
 import type { ConfigService } from "@/service/config-service.interface";
 import type { IpService } from "@/service/ip-service.interface";
 import type { JwtService } from "@/service/jwt-service.interface";
-import type { QueueService } from "@/service/queue-service.interface";
 import type { SessionService } from "@/service/session-service.interface";
 
 // Importing Service Implementations
@@ -18,7 +17,6 @@ import { CacheServiceImpl } from "@/service/impl/cache-service-impl";
 import { ConfigServiceImpl } from "@/service/impl/config-service-impl";
 import { IpServiceImpl } from "@/service/impl/ip-service-impl";
 import { JwtServiceImpl } from "@/service/impl/jwt-service-impl";
-import { QueueServiceImpl } from "@/service/impl/queue-service-impl";
 import { SessionServiceImpl } from "@/service/impl/session-service-impl";
 
 // Importing Repository Interfaces
@@ -42,7 +40,6 @@ container.bind<ConfigService>(TYPES.ConfigService).to(ConfigServiceImpl);
 container.bind<IpService>(TYPES.IpService).to(IpServiceImpl);
 container.bind<NodePgDatabase>(TYPES.Database).toConstantValue(db);
 container.bind<JwtService>(TYPES.JwtService).to(JwtServiceImpl);
-container.bind<QueueService>(TYPES.QueueService).to(QueueServiceImpl);
 container.bind<SessionService>(TYPES.SessionService).to(SessionServiceImpl);
 
 // Binding Repository to the container

@@ -7,7 +7,6 @@ export const TYPES = {
     ConfigService: Symbol.for("ConfigService"),
     IpService: Symbol.for("IpService"),
     JwtService: Symbol.for("JwtService"),
-    QueueService: Symbol.for("QueueService"),
     SessionService: Symbol.for("SessionService"),
 
     // Repository

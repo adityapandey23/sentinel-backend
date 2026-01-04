@@ -9,6 +9,7 @@ import { createHash } from "crypto";
 import type { AgentDetails } from "express-useragent";
 import type { DbOrTransaction } from "@/db";
 import type { GetSessionResponse } from "@/dto/session-response";
+import type { Session } from "@/model";
 
 @injectable()
 export class SessionServiceImpl implements SessionService {
@@ -44,16 +45,15 @@ export class SessionServiceImpl implements SessionService {
 
   }
 
-  // async getSessions(userId: string, tx?: DbOrTransaction): Promise<Session[] | undefined> {
-  //   return await this.sessionRepository.findByUserId(userId);
-  // }
-
   async getSessions(userId: string, tx?: DbOrTransaction): Promise<GetSessionResponse[]> {
     return await this.sessionRepository.findByUserId(userId);
   }
 
-  async updateSession(sessionId: string, tx?: DbOrTransaction): Promise<void> {
-    // Update the session's updatedAt timestamp to track activity
+  async updateSession(sessionId: string, data: Partial<Session>,tx?: DbOrTransaction): Promise<void> {
+    await this.sessionRepository.update(sessionId, data, tx);
+  }
+
+  async updateLastActiveDetails(sessionId: string, tx?: DbOrTransaction): Promise<void> {
     await this.sessionRepository.update(sessionId, {}, tx);
   }
 

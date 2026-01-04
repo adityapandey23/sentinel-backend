@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import type { JwtPayload, JwtService } from "../jwt-service.interface";
 import { TYPES } from "@/di/types";
 import type { ConfigService } from "../config-service.interface";
-import { jwtVerify, SignJWT, type JWTPayload } from "jose";
+import { decodeJwt, jwtVerify, SignJWT, type JWTPayload } from "jose";
 
 @injectable()
 export class JwtServiceImpl implements JwtService {
@@ -37,7 +37,7 @@ export class JwtServiceImpl implements JwtService {
   }
 
   async signRefreshToken(payload: JwtPayload): Promise<string> {
-    return new SignJWT({ sub: payload.sub } as JWTPayload)
+    return new SignJWT({ sub: payload.sub, sid: payload.sid } as JWTPayload)
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime(this.refreshTokenExpiry)

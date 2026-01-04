@@ -2,6 +2,7 @@ export interface JwtPayload {
     sub: string,
     email?: string,
     role?: string,
+    sid?: string,  // Session ID
     iat?: number,
     exp?: number
 }

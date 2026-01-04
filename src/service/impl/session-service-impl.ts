@@ -5,7 +5,7 @@ import type { SessionRepository } from "@/repository/session-repository";
 import type { GeoInfoRepository } from "@/repository/geo-info-repository";
 import type { UserAgentRepository } from "@/repository/user-agent-repository";
 import type { IpService } from "../ip-service.interface";
-import { createHash, randomUUID } from "crypto";
+import { createHash } from "crypto";
 import type { AgentDetails } from "express-useragent";
 import type { DbOrTransaction } from "@/db";
 import type { GetSessionResponse } from "@/dto/session-response";
@@ -22,6 +22,7 @@ export class SessionServiceImpl implements SessionService {
 
   async saveSession(
     userId: string,
+    sessionId: string,
     refreshToken: string,
     expiresAt: Date,
     context: SessionContext,
@@ -33,7 +34,7 @@ export class SessionServiceImpl implements SessionService {
     const userAgentId = await this.getOrCreateUserAgent(context.userAgent, tx);
 
     await this.sessionRepository.create({
-      id: randomUUID(),
+      id: sessionId,
       token: refreshToken,
       expiresAt,
       userId,
@@ -51,9 +52,26 @@ export class SessionServiceImpl implements SessionService {
     return await this.sessionRepository.findByUserId(userId);
   }
 
-  async updateSession(): Promise<void> {}
+  async updateSession(sessionId: string, tx?: DbOrTransaction): Promise<void> {
+    // Update the session's updatedAt timestamp to track activity
+    await this.sessionRepository.update(sessionId, {}, tx);
+  }
 
-  async deleteAllSessions(): Promise<void> {}
+  async deleteSession(
+    userId: string,
+    sessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<boolean> {
+    return await this.sessionRepository.deleteByIdAndUserId(sessionId, userId, tx);
+  }
+
+  async deleteAllSessionsExcept(
+    userId: string,
+    currentSessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<number> {
+    return await this.sessionRepository.deleteAllExcept(userId, currentSessionId, tx);
+  }
 
   // Helper functions
 

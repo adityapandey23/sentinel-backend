@@ -2,7 +2,7 @@ import { geoInfo, session, userAgent } from "@/db/schema";
 import { TYPES } from "@/di/types";
 import type { NewSession, Session } from "@/model";
 import type { GetSessionResponse } from "@/dto/session-response";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { inject, injectable } from "inversify";
 import { DatabaseError } from "@/errors";
@@ -131,6 +131,42 @@ export class SessionRepositoryImpl implements SessionRepository {
         "Failed to find session by token",
         error as Error
       );
+    }
+  }
+
+  async deleteByIdAndUserId(
+    sessionId: string,
+    userId: string,
+    tx?: DbOrTransaction
+  ): Promise<boolean> {
+    const db = tx ?? this.database;
+    try {
+      const result = await db
+        .delete(session)
+        .where(and(eq(session.id, sessionId), eq(session.userId, userId)))
+        .returning();
+      return result.length > 0;
+    } catch (error) {
+      console.error("Database error in SessionRepository.deleteByIdAndUserId:", error);
+      throw new DatabaseError("Failed to delete session", error as Error);
+    }
+  }
+
+  async deleteAllExcept(
+    userId: string,
+    exceptSessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<number> {
+    const db = tx ?? this.database;
+    try {
+      const result = await db
+        .delete(session)
+        .where(and(eq(session.userId, userId), ne(session.id, exceptSessionId)))
+        .returning();
+      return result.length;
+    } catch (error) {
+      console.error("Database error in SessionRepository.deleteAllExcept:", error);
+      throw new DatabaseError("Failed to delete sessions", error as Error);
     }
   }
 }

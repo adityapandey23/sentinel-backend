@@ -39,9 +39,13 @@ export class AuthServiceImpl implements AuthService {
       throw new UnauthorizedError("Invalid email or password");
     }
 
+    // Generate session ID first so we can include it in JWT tokens
+    const sessionId = randomUUID();
+
     const payload: JwtPayload = {
       sub: existingUser.id,
       email: existingUser.email,
+      sid: sessionId,
     };
 
     const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -59,6 +63,7 @@ export class AuthServiceImpl implements AuthService {
     await this.database.transaction(async (tx) => {
       await this.sessionService.saveSession(
         existingUser.id,
+        sessionId,
         refreshToken,
         refreshTokenExpiry,
         context,
@@ -78,8 +83,9 @@ export class AuthServiceImpl implements AuthService {
 
     const hashedPassword = await Bun.password.hash(dto.password);
 
-    // Generate tokens before transaction so we can use refreshToken inside
+    // Generate IDs before transaction so we can use them inside
     const userId = randomUUID();
+    const sessionId = randomUUID();
     const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     // We need to generate the payload first, then tokens, then wrap DB ops in transaction
@@ -103,6 +109,7 @@ export class AuthServiceImpl implements AuthService {
       const payload: JwtPayload = {
         sub: created.id,
         email: created.email,
+        sid: sessionId,
       };
 
       // Generate tokens (these don't involve DB, so safe to do inside tx)
@@ -114,6 +121,7 @@ export class AuthServiceImpl implements AuthService {
       // Save session within the same transaction
       await this.sessionService.saveSession(
         created.id,
+        sessionId,
         refreshTkn,
         refreshTokenExpiry,
         context,
@@ -135,9 +143,11 @@ export class AuthServiceImpl implements AuthService {
       throw new NotFoundError("User not found");
     }
 
+    // Preserve the session ID when refreshing the access token
     const newPayload: JwtPayload = {
       sub: existingUser.id,
       email: existingUser.email,
+      sid: payload.sid,
     };
 
     return this.jwtService.signAccessToken(newPayload);

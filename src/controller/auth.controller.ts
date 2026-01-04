@@ -46,11 +46,6 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/token")
   private async token(@request() req: Request, @response() res: Response) {
-    const context = <SessionContext> {
-      ip: req.ip,
-      userAgent: req.useragent,
-    };
-
     const { refreshToken } = req.body;
     const accessToken = await this.authService.token(refreshToken);
     res.json({ accessToken });

@@ -12,6 +12,7 @@ export interface SessionService {
   // Accepts optional transaction for atomic operations with user creation
   saveSession(
     userId: string,
+    sessionId: string,
     refreshToken: string,
     expiresAt: Date,
     context: SessionContext,
@@ -19,13 +20,24 @@ export interface SessionService {
   ): Promise<void>; 
 
   // This needs to be called somewhere in the middleware maybe ?
-  updateSession(): Promise<void>; 
+  updateSession(sessionId: string, tx?: DbOrTransaction): Promise<void>; 
 
   getSessions(
     userId: string,
     tx?: DbOrTransaction
   ): Promise<GetSessionResponse[]>;
 
-  // This should take up an optional parameter which avoid revoking that particular session
-  deleteAllSessions(): Promise<void>; 
+  // Delete a specific session by ID (for revoking a specific session)
+  deleteSession(
+    userId: string,
+    sessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<boolean>;
+
+  // Delete all sessions except the current one
+  deleteAllSessionsExcept(
+    userId: string,
+    currentSessionId: string,
+    tx?: DbOrTransaction
+  ): Promise<number>;
 }

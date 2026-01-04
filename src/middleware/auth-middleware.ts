@@ -24,7 +24,8 @@ export async function authMiddleware(
 
     req.user = {
       userId: payload.sub,
-      email: payload.email
+      email: payload.email,
+      sessionId: payload.sid
     }
 
     next();

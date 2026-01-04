@@ -8,9 +8,15 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import cors from "cors";
 import { container } from "./di/inversify.config";
 
+// Controllers
 import "./controller/auth.controller";
 import "./controller/session.controller";
 import "./controller/fact.controller";
+
+// Cron jobs
+import "./cron/clean-up-sessions";
+import "./cron/clean-up-geo-info";
+import "./cron/clean-up-user-agent";
 
 import type { ConfigService } from "./service/config-service.interface";
 import { TYPES } from "./di/types";

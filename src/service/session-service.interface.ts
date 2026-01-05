@@ -38,6 +38,8 @@ export interface SessionService {
     tx?: DbOrTransaction,
   ): Promise<GetSessionResponse[]>;
 
+  sessionExists(sessionId: string, tx?: DbOrTransaction): Promise<boolean>;
+
   // Delete a specific session by ID (for revoking a specific session)
   deleteSession(
     userId: string,

@@ -33,4 +33,6 @@ export interface SessionRepository {
     exceptSessionId: string,
     tx?: DbOrTransaction,
   ): Promise<number>;
+
+  existsById(sessionId: string, tx?: DbOrTransaction): Promise<boolean>;
 }

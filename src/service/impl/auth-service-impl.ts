@@ -157,13 +157,20 @@ export class AuthServiceImpl implements AuthService {
   async token(refreshToken: string): Promise<string> {
     const payload = await this.jwtService.verifyRefreshToken(refreshToken);
 
+    // Verify the session still exists (i.e., hasn't been revoked)
+    const sessionExists = await this.sessionService.sessionExists(
+      payload.sid as string, // I know it's bad to assert string values
+    );
+    if (!sessionExists) {
+      throw new UnauthorizedError("Session has been revoked");
+    }
+
     const existingUser = await this.userRepository.findById(payload.sub);
 
     if (!existingUser) {
       throw new NotFoundError("User not found");
     }
 
-    // Preserve the session ID when refreshing the access token
     const newPayload: JwtPayload = {
       sub: existingUser.id,
       email: existingUser.email,

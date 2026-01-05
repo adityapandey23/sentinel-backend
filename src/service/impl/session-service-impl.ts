@@ -99,6 +99,13 @@ export class SessionServiceImpl implements SessionService {
     );
   }
 
+  async sessionExists(
+    sessionId: string,
+    tx?: DbOrTransaction,
+  ): Promise<boolean> {
+    return await this.sessionRepository.existsById(sessionId, tx);
+  }
+
   // Helper functions
 
   private async getOrCreateGeoInfo(

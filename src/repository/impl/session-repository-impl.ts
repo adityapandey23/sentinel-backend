@@ -175,4 +175,14 @@ export class SessionRepositoryImpl implements SessionRepository {
       throw new DatabaseError("Failed to delete sessions", error as Error);
     }
   }
+
+  async existsById(sessionId: string, tx?: DbOrTransaction): Promise<boolean> {
+    const db = tx ?? this.database;
+    const result = await db
+      .select({ id: session.id })
+      .from(session)
+      .where(eq(session.id, sessionId))
+      .limit(1);
+    return result.length > 0;
+  }
 }
